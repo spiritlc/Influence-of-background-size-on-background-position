@@ -10,22 +10,142 @@
             margin: 0;
             padding: 0;
         }
-        .img-block {
-            /* margin-left: 380px;
-            margin-right: 270px; */
-            width: 400px;
-            height: 400px;
+        body {
+            padding-left: 200px
+        }
+        #img-block {
+            width: 350px;
+            height: 300px;
             border: 1px solid green;
-            background: url(./hollow.jpeg) no-repeat;
-            /* background-position: -380px -270px; */
-            background-position-x: 50%;
-            background-position-y: 50%;
-            background-size: cover;
+            background-image: url(./hollow.jpeg);
+            background-repeat: no-repeat;
+        }
+        button {
+            padding: 4px;
+            cursor: pointer;
+            cursor: hand;
+            outline: none;
+        }
+        button.active {
+            color: #009241;
+            border: 1px solid #009241;
         }
     </style>
 </head>
 <body>
-    <div class="img-block">
+    <!-- 图片容器 -->
+    <div id="img-block">
     </div>
+    <br>
+    <!-- 切换图片尺寸 -->
+    <div class="img-size-controller">
+        <label for="">切换容器尺寸</label>
+        <button class="img-size-btn ">与图片宽高等比例</button>
+        <button class="img-size-btn active">不等比例</button>
+    </div>
+    <br>
+    <!-- 切换图片 -->
+    <div class="img-controller">
+        <label for="">切换图片</label>
+        <button class="img-btn active" img-name="hollow.jpeg">宽大于高</button>
+        <button class="img-btn " img-name="timg.jpeg">高大于宽</button>
+        <button class="img-btn" img-name="fangxing.jpeg">正方形</button>
+    </div>
+    <br>
+    <!-- 切换background-size -->
+    <div class="size-controller">
+        <label for="">background-size</label>
+        <button class="size-btn active">auto</button>
+        <button class="size-btn">contain</button>
+        <button class="size-btn">cover</button>
+    </div>
+    <br>
+    <!-- 切换background-position -->
+    <div class="position-controller">
+        <label>bakcgorund-position</label>
+        <br>
+        <label for="">x:</label>
+        <input unit="px" position="X" class="x-position-px position-input" type="number"> px
+        <input unit="%" position="X"  class="x-position-per position-input" type="number"> %
+        <br>
+        <label for="">y:</label>
+        <input unit="px" position="Y" class="y-position-px position-input" type="number"> px
+        <input unit="%" position="Y" class="y-position-per position-input" type="number"> %
+    </div>
+    <script>
+        // 获取dom
+        const imgSizeArr = [
+            ['632px', '395px'],
+            ['250px', '344px'],
+            ['300px', '300px']
+        ]
+        let imgSizeIndex = 1
+        let imgIndex = 0
+        const imgBlock = document.querySelector('#img-block') // 背景图块
+        const imgSizeBtn = document.querySelectorAll('.img-size-btn') // 切换图片的按钮
+        let chooseImgSizeDom = document.querySelector('.img-size-controller .active') // 当前active img dom 块
+        const imgBtn = document.querySelectorAll('.img-btn') // 切换图片的按钮
+        let chooseImgDom = document.querySelector('.img-controller .active') // 当前active img dom 块
+        const sizeBtn = document.querySelectorAll('.size-btn') // 切换size按钮
+        let chooseSizeDom = document.querySelector('.size-controller .active') // 当前active size dom 块
+        let positionInput = document.querySelectorAll('.position-input') // 获取所有的position的input的dom
+        function changeChoose(chooseDom, item, className) {
+            chooseImgSizeDom.className = className
+            chooseImgSizeDom = item
+            chooseImgSizeDom.className = `${className} active`
+        }
+        function changeBlockSize(imgSizeIndex, imgIndex) {
+            if (imgSizeIndex === 0) {
+                imgBlock.style.width = imgSizeArr[imgIndex][0]
+                imgBlock.style.height = imgSizeArr[imgIndex][1]
+            } else {
+                imgBlock.style.width = '350px'
+                imgBlock.style.height = '300px'
+            }
+        }
+        // 容器size 添加切换事件
+        imgSizeBtn.forEach((item,i)  => {
+            item.onclick = () => {
+                chooseImgSizeDom.className = 'img-size-btn'
+                chooseImgSizeDom = item
+                chooseImgSizeDom.className = `img-size-btn active`
+                imgSizeIndex = i
+                changeBlockSize(imgSizeIndex, imgIndex)
+            }
+        })
+        // img 添加切换事件
+        imgBtn.forEach((item,i)  => {
+            item.onclick = () => {
+                chooseImgDom.className = 'img-btn'
+                chooseImgDom = item
+                chooseImgDom.className = 'img-btn active'
+                imgIndex = i
+                imgBlock.style.backgroundImage = `url(${item.getAttribute('img-name')})`
+                changeBlockSize(imgSizeIndex, imgIndex)
+            }
+        })
+        // size 添加切换事件
+        sizeBtn.forEach((item,i)  => {
+            item.onclick = () => {
+                if (chooseSizeDom) {
+                    chooseSizeDom.className = 'size-btn'
+                }
+                chooseSizeDom = item
+                chooseSizeDom.className = 'size-btn active'
+                imgBlock.style.backgroundSize = item.innerText
+            }
+        })
+        // 设置input修改的监听事件
+        positionInput.forEach((item, i) => {
+            item.oninput = () => {
+                const tempStyle = `backgroundPosition${item.getAttribute("position")}`
+                imgBlock.style[tempStyle] = `${item.value || 0}${item.getAttribute('unit')}`
+                if (!item.value) {
+                    return
+                }
+                document.querySelector(`.${item.getAttribute('position').toLowerCase()}-position-${item.getAttribute('unit') === 'px' ? 'per' : 'px'}`).value = ''
+            }
+        })
+    </script>
 </body>
 </html>
